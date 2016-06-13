@@ -55,10 +55,10 @@ public class ChunkEntity {
         SimplexNoise noise2 = new SimplexNoise(seed + 1);
 
         float freq1 = 0.03f;
-        float amp1 = 4f;
+        float amp1 = 2f;
 
         float freq2 = 0.01f;
-        float amp2 = 16f;
+        float amp2 = 6f;
 
         for(int i=0; i<voxelData.length; i++){
             for(int k=0; k<voxelData[i][0].length; k++) {

@@ -7,6 +7,8 @@ import org.ninthworld.simplegeometry.models.Model;
 import org.ninthworld.simplegeometry.models.RawModel;
 import org.ninthworld.simplegeometry.renderers.Loader;
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -18,6 +20,61 @@ import java.util.List;
  * Created by NinthWorld on 6/9/2016.
  */
 public class VoxelHelper {
+
+    public static Entity load(Loader loader, BufferedImage img){
+        List<Vector3f> colors = new ArrayList<>();
+        int maxX = 0, maxY = 0, maxZ = 0;
+
+        int[][] imgData = new int[img.getWidth()][img.getHeight()-1];
+        for(int x=0; x<img.getWidth(); x++) {
+            for (int y = 0; y < img.getHeight(); y++) {
+                Color c = new Color(img.getRGB(x, y), true);
+                if (x == 0 && y == 0) {
+                    maxX = c.getRed();
+                    maxY = c.getGreen();
+                    maxZ = c.getBlue();
+                }
+
+                if (y > 0 && c.getAlpha() > 0) {
+                    Vector3f color = new Vector3f(c.getRed()/255f, c.getGreen()/255f, c.getBlue()/255f);
+                    int index = -1;
+                    for (Vector3f col : colors) {
+                        if (col.x == color.x && col.y == color.y && col.z == color.z) {
+                            index = colors.indexOf(col);
+                        }
+                    }
+                    if (index == -1) {
+                        colors.add(color);
+                        index = colors.indexOf(color);
+                    }
+                    imgData[x][y - 1] = index+1;
+                }
+            }
+        }
+
+        int[][][] data = new int[maxX][maxY][maxZ];
+        for(int z=0; z<data[0][0].length; z++){
+            for(int x=0; x<data.length; x++){
+                for(int y=0; y<data[0].length; y++){
+                    data[x][data[0].length-y-1][z] = imgData[x][y + z*maxY];
+                }
+            }
+        }
+
+        Vector3f[] materials = new Vector3f[colors.size()];
+        for(int i=0; i<materials.length; i++){
+            materials[i] = colors.get(i);
+        }
+
+        VoxelFaces[][][] voxelFaces = VoxelHelper.calculateFaces(data, true);
+        Faces[] faces = VoxelHelper.greedyMesh(voxelFaces, data, materials);
+
+        Model model = new Model(generateRawModel(loader, faces));
+        Entity entity = new Entity(model, new Vector3f(0, 0, 0), 0, 0, 0, 0.5f);
+
+        return entity;
+    }
+
     public static Entity load(Loader loader, File file) throws IOException {
         List<Vector3f> colors = new ArrayList<>();
         int colorCount = -1;
@@ -66,7 +123,6 @@ public class VoxelHelper {
         for(int i=0; i<materials.length; i++){
             materials[i] = colors.get(i);
         }
-
 
         VoxelFaces[][][] voxelFaces = VoxelHelper.calculateFaces(data, true);
         Faces[] faces = VoxelHelper.greedyMesh(voxelFaces, data, materials);
@@ -185,8 +241,8 @@ public class VoxelHelper {
         // Right and Left Faces
         for(int currentFace = 4; currentFace < 6; currentFace++) {
             allFaces[currentFace] = new Faces();
-            for (int x = 0; x < voxelFaces[0][0].length; x++) {
-                for (int z = 0; z < voxelFaces.length; z++) {
+            for (int x = 0; x < voxelFaces.length; x++) {
+                for (int z = 0; z < voxelFaces[0][0].length; z++) {
                     for (int y = 0; y < voxelFaces[0].length; y++) {
                         if (voxelFaces[x][y][z].faces[currentFace]) {
                             int material = voxels[x][y][z];

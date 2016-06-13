@@ -15,6 +15,7 @@ import org.ninthworld.simplegeometry.postProcessing.Fbo;
 import org.ninthworld.simplegeometry.postProcessing.PostProcessing;
 import org.ninthworld.simplegeometry.renderers.*;
 
+import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -31,10 +32,20 @@ public class Main {
         Loader loader = new Loader();
 
         List<Entity> entities = new ArrayList<>();
-        //entities.addAll(VoxelModelLoader.load(loader, new File("models/pumpkin.vobj")));
-        Entity pumpkin = VoxelHelper.load(loader, new File("models/pumpkin.vobj"));
-        pumpkin.setPosition(new Vector3f(0, 10, 0));
-        entities.add(pumpkin);
+        //Entity pumpkin = VoxelHelper.load(loader, new File("models/pumpkin.vobj"));
+        Entity tankBody = VoxelHelper.load(loader, ImageIO.read(new File("models/tank_body.png")));
+        Entity tankWheelLeft = VoxelHelper.load(loader, ImageIO.read(new File("models/tank_wheel.png")));
+        Entity tankWheelRight = VoxelHelper.load(loader, ImageIO.read(new File("models/tank_wheel.png")));
+
+        //pumpkin.setPosition(new Vector3f(0, 10, 0));
+        tankBody.setPosition(new Vector3f(0, 10, -15));
+        tankWheelLeft.setPosition(new Vector3f(-66, 10, -15-6));
+        tankWheelLeft.setRotY(180);
+        tankWheelRight.setPosition(new Vector3f(0, 10, -15-7));
+
+        entities.add(tankBody);
+        entities.add(tankWheelLeft);
+        entities.add(tankWheelRight);
 
         float lightAngle = 0, lightDistance = 10000;
         Light light = new Light(new Vector3f(0, 0, 0), new Vector3f(1, 1, 1));
