@@ -6,4 +6,4 @@
 * Simple shadow mapping
 * Loading voxel models
 
-!(SimpleGeometry Screenshot)[https://github.com/ninthworld/SimpleGeometry/blob/master/screenshots/screenshot1.png]
+![SimpleGeometry Screenshot](https://github.com/ninthworld/SimpleGeometry/blob/master/screenshots/screenshot1.png)
